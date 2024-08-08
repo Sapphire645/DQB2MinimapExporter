@@ -8,7 +8,10 @@ Start = 2401803
 End = 256*256*2
 
 mountain_folder_path = 'Mountain'
+mountain_chunky_folder_path = 'MountainC'
+
 map_path = 'SheetCompilation.png'
+map_chunky_path = 'SheetChunky.png'
 image_width = 256
 
 ##Crop sizes for Heresy mask
@@ -26,24 +29,40 @@ def extract_tiles_from_map(tile_map_path, tile_size=(16, 16)):
     for y in range(0, tile_map_height, tile_size[1]):
         for x in range(0, tile_map_width, tile_size[0]):
             tile = tile_map.crop((x, y, x + tile_size[0], y + tile_size[1]))
+            if valid[4] == 16:
+                tile = tile.resize((16,16),Image.NEAREST)
             tiles.append(tile)
     return tiles
 
 def load_tiles(folder_path,col,rang):
     #Gets the mountain tiles. Don't ask why it is so bad hush.
     tiles = []
-    for i in range(rang):
+    tile_path = os.path.join(folder_path, "0x000.png")
+    tile = Image.open(tile_path).convert('RGBA')
+    if valid[4] == 1:
+        tile = tile.crop((1,1,2,2))
+    tiles.append(tile)
+    for i in range(1,rang):
         tile_path = os.path.join(folder_path, f"0x{i:03X}.png")
         if os.path.exists(tile_path):
             tile = Image.open(tile_path).convert('RGBA')
+            if valid[4] == 16:
+                tile = tile.resize((16,16),Image.NEAREST)
             tiles.append(tile)
         else:
-            tiles.append(Image.new('RGBA', (16, 16), color=col))
+            if valid[4] == 1:
+                tiles.append(Image.new('RGBA', (1, 1), color=col))
+            else:
+                tiles.append(Image.new('RGBA', (16, 16), color=col))
     return tiles
 
 def construct_image(binary_data, tiles,mountain, image_width, HD):
     #Makes the image
-    tile_size = (16, 16)
+    if valid[4] == 1:
+        tile_size = (1, 1)
+    else:
+        tile_size = (16, 16)
+
     num_tiles = 256*255
 
     # Calculate the number of rows based on the number of tiles and specified width
@@ -79,33 +98,41 @@ def construct_image(binary_data, tiles,mountain, image_width, HD):
         constructed_image.convert('RGB')
     #Crop and resize
     if valid[3] == True:
+        if valid[4] == 1:
+            constructed_image = constructed_image.resize((constructed_image.size[0]*16, constructed_image.size[1]*16), Image.NEAREST)
         try:
             constructed_image = constructed_image.crop((HeresyDictionary[HD]))
         except:
             print(f"Hermit's Heresy not supported yet! {HD}")
-        constructed_image = constructed_image.resize((constructed_image.size[0]//2, constructed_image.size[1]//2), Image.LANCZOS)
+        if valid[4]:
+            constructed_image = constructed_image.resize((constructed_image.size[0]//2, constructed_image.size[1]//2), Image.NEAREST)
+        else:    
+            constructed_image = constructed_image.resize((constructed_image.size[0]//2, constructed_image.size[1]//2), Image.LANCZOS)
     return constructed_image
 
 
-def process(binary_file_path, tile_folder_path,mountain_folder_path,image_width, islands,folder_path):
+def process(binary_file_path,mountain_folder_path,image_width, islands,folder_path):
     # Load the binary data from the file
     with open(binary_file_path, 'rb') as f:
         binary_data = list(f.read())
 
     # Load the tiles from the folder
-    tiles = extract_tiles_from_map(map_path)
-    mountain = load_tiles(mountain_folder_path,'red',256)
-    
+    if not valid[4]:
+        tiles = extract_tiles_from_map(map_path)
+        mountain = load_tiles(mountain_folder_path,'red',256)
+    else:
+        tiles = extract_tiles_from_map(map_chunky_path,(1, 1))
+        mountain = load_tiles(mountain_chunky_folder_path,'red',256)
     Pointer = Start
     c = 1
-    for i in range(15):
+    for i in range(24):
         if i in islands:
             path_Check.config(text="Please wait...("+str(c)+"/"+str(len(islands))+")",fg = "orange")
             root.update()
-            constructed_image = construct_image(binary_data[Pointer+(256*2):Pointer+End], tiles,mountain, image_width, i)
+            constructed_image = construct_image(binary_data[Pointer+(256*2):Pointer+End], tiles, mountain, image_width, i)
             constructed_image.save(folder_path+"//Minimap"+str(i+1).zfill(2)+".png", 'PNG')
             c += 1
-        Pointer = Pointer + End
+        Pointer = Pointer + End + 4
     path_Check.config(text="Export complete!",fg = "green")
     
 
@@ -114,12 +141,13 @@ def process(binary_file_path, tile_folder_path,mountain_folder_path,image_width,
 ############################################################################################################
 
 
-Island_names = ((-1,"Select\nAll","gold"),(0,"Isle of\nAwakening\n\nからっぽ島","aqua"),(1,"Furrowfield\n\nモンゾーラ島","medium sea green"),
-                (2,"Khrumbul-Dun\n\nオッカムル島","orange"),(3,"Moonbrooke\n\nムーンブルク島","#00FFC0"),(4,"Malhalla\n\n破壊天体シドー","#BBBBFF"),
+Island_names = ((0,"Isle of\nAwakening\n\nからっぽ島","aqua"),(1,"Furrowfield\n\nモンゾーラ島","medium sea green"),
+                (2,"Khrumbul-Dun\nオッカムル島","orange"),(20,"Upper level","#C47400"),(21,"Lower level","#944D00"),
+                (3,"Moonbrooke\n\nムーンブルク島","#00FFC0"),(4,"Malhalla\n\n破壊天体シドー","#BBBBFF"),
                 (8,"Skelkatraz\n\n監獄島","grey"),(10,"Buildertopia 1\n\nかいたく島1","#FFDDDD"),(11,"Buildertopia 2\n\nかいたく島2","#FFE6DD"),
-                (13,"Buildertopia 3\n\nかいたく島3","#FFEEDD"))
+                (13,"Buildertopia 3\n\nかいたく島3","#FFEEDD"),(7,"Angler's Isle\n\nツリル島","#DDF0FF"))
 
-valid = [False,"",True,False] #Python.... [Valid, Folder_Path, Visible, Hermit_Mask]
+valid = [False,"",True,False,0] #Python.... [Valid, Folder_Path, Visible, Hermit_Mask, chunky_configuration]
 
 
 def export_check():
@@ -130,14 +158,14 @@ def export_check():
         )
         if folder_path:
             Islands = []
-            c = 1
-            for i in button_vars[1:]:
+            c = 0
+            for i in button_vars:
                 if i.get() == 1:
                     Islands.append(Island_names[c][0])
                 c += 1
             path_Check.config(text="Please wait...",fg = "orange")
             root.update()
-            process(valid[1], tile_folder_path, mountain_folder_path, image_width, Islands,folder_path)
+            process(valid[1], mountain_folder_path, image_width, Islands,folder_path)
         
 def checkfile(file_path):
     #Tries to see if the file is valid. Fails miserably.
@@ -174,13 +202,10 @@ def on_button_click(index):
         button_vars[index].set(1)
     else:
         button_vars[index].set(0)
-    if index == 0:
-        if button_vars[0].get() == 1:
-            upda = 1
-        else:
-            upda = 0
-        for var in button_vars:
-            var.set(upda)
+
+def select_command(upda):
+    for var in button_vars:
+        var.set(upda)
 
 def visible_command():
     #Visible click
@@ -200,6 +225,21 @@ def heresy_command():
         valid[3] = True
         heresy_button.config(bg = "gold")
 
+def chunky_command(button):
+    if button == valid[4]:
+        print(button)
+        valid[4] = 0
+        chunky_button_1x.config(bg = "SystemButtonFace")
+        chunky_button_16x.config(bg = "SystemButtonFace")
+    else:
+        if button == 16:
+            valid[4] = 16
+            chunky_button_1x.config(bg = "SystemButtonFace")
+            chunky_button_16x.config(bg = "gold")
+        else:
+            valid[4] = 1
+            chunky_button_1x.config(bg = "gold")
+            chunky_button_16x.config(bg = "SystemButtonFace")
 
 # Create the main window
 root = tk.Tk()
@@ -227,28 +267,69 @@ path_Check.pack(pady=0, padx=10)
 options_frame = tk.Frame(root)
 options_frame.pack(padx=0, pady=0)
 
+select_button = tk.Button(
+    options_frame,
+    width = 13,
+    text="Select All",
+    command=lambda i=True:select_command(i)
+)
+
+select_button.pack(pady=0)
+select_button.grid(row=0, column=0, padx=5, pady=0)
+
+unselect_button = tk.Button(
+    options_frame,
+    width = 13,
+    text="Unselect All",
+    command=lambda i=False:select_command(i)
+)
+
+unselect_button.grid(row=1, column=0, padx=5, pady=0)
+
 visible_button = tk.Button(
     options_frame,
-    text="Hide unexplored tiles",
+    height = 3,
+    text="Hide unexplored\ntiles",
     command=visible_command
 )
 
-visible_button.pack(pady=0)
-visible_button.grid(row=0, column=0, padx=5, pady=5)
+visible_button.grid(row=0, column=1,rowspan=2, padx=5, pady=5)
 
 heresy_button = tk.Button(
     options_frame,
-    text="Hermit's Heresy mask",
+    height = 3,
+    text="Hermit's Heresy\nmask",
     command=heresy_command
 )
 
-heresy_button.grid(row=0, column=1, padx=5, pady=5)
+heresy_button.grid(row=0, column=2,rowspan=2, padx=5, pady=5)
+
+chunky_button_1x = tk.Button(
+    options_frame,
+    width = 13,
+    text="Chunky Tiles 1x",
+    command=lambda i=1:chunky_command(i),
+    pady=0
+)
+
+chunky_button_1x.grid(row=0, column=3, padx=5, pady=0)
+
+chunky_button_16x = tk.Button(
+    options_frame,
+    width = 13,
+    text="Chunky Tiles 16x",
+    command=lambda i=16:chunky_command(i),
+    pady=0
+)
+
+chunky_button_16x.grid(row=1, column=3, padx=5, pady=0)
 
 button_frame = tk.Frame(root)
 button_frame.pack(padx=10, pady=10)
 
 export_button = tk.Button(
     root,
+    width = 30,
     text="Export!",
     command=export_check
 )
@@ -256,18 +337,31 @@ export_button = tk.Button(
 export_button.pack(pady=20)
 
 # Island buttons
-for i in range(10):
+co = 0
+for i in range(12):
     var = tk.IntVar()
     button_vars.append(var)
-    
-    button = tk.Button(
-        button_frame,
-        text=Island_names[i][1],
-        width=button_size // 5,
-        height=button_size // 20,
-        command=lambda i=i: on_button_click(i)
-    )
-    button.grid(row=i//5, column=i%5, padx=5, pady=5)
+    if i in (2,3,4):
+        button = tk.Button(
+            button_frame,
+            text=Island_names[i][1],
+            width=button_size // 5,
+            command=lambda i=i: on_button_click(i),padx=0, pady=0
+            
+        )
+        button.grid(row=i-2, column=co%5, padx=0, pady=0)
+        if i == 4:
+            co += 1
+    else:
+        button = tk.Button(
+            button_frame,
+            text=Island_names[i][1],
+            width=button_size // 5,
+            height=button_size // 20,
+            command=lambda i=i: on_button_click(i)
+        )
+        button.grid(row=(co//5)*3 , column=co%5, rowspan=3, padx=5, pady=5)
+        co += 1
     buttons.append(button)
 
 # Color buttons
