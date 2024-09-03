@@ -1,0 +1,18 @@
+Selecciona una carpeta
+Procesando...
+Archivo valido!
+Archivo invalido!
+Selecciona archivo binario (Turtle-Insect's CMN.DAT exportado)
+Archivo seleccionado
+Ningun archivo seleccionado
+Minimap Exporter
+Abrir archivo
+Seleccionar todo
+Deseleccionar todo
+Esconder casillas
+no exploradas
+Procesado para
+Hermit's Heresy
+Casillas Planas 1x
+Casillas Planas 16x
+Exportar!
