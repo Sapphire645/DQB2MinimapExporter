@@ -5,7 +5,7 @@ Archivo invalido!
 Selecciona archivo binario
 Archivo seleccionado
 Ningun archivo seleccionado
-Minimap Exporter
+DQB2 Minimap Exporter
 Abrir archivo
 Seleccionar todo
 Deseleccionar todo
@@ -16,3 +16,31 @@ Hermit's Heresy
 Casillas Planas 1x
 Casillas Planas 16x
 Exportar!
+#-Aqui estan los nombres con los que los mapas se guardan, cambialos si quieres.
+STGDAT01-IoA
+STGDAT02-Furrowfield
+STGDAT03-Khrumbul-Dun
+STGDAT04-Moonbrooke
+STGDAT05-Malhalla
+STGDAT09-Angler
+STGDAT10-Skelkatraz
+STGDAT12-BuildertopiaAlpha
+STGDAT13-BuildertopiaBeta
+STGDAT14-BattleAtoll
+STGDAT16-BuildertopiaGamma
+Parcial
+Completo
+NOTA: HERMIT HERESY /
+CHUNK EDITOR+
+PUEDE FALLAR
+DQB2 Minimap Revealer
+Revelar
+minimapa completo
+Resetear
+casillas
+Revelar
+Esconder
+Arreglar save file con minimapa roto
+Chunk Editor+
+mascara
+EN BUILDERTOPIAS

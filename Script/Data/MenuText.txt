@@ -31,7 +31,7 @@ STGDAT16-BuildertopiaGamma
 Partial
 Full
 NOTE: BUILDERTOPIA
-HERMIT'S HERESY
+HERMIT'S HERESY /
 CROPPING MAY BE WRONG.
 DQB2 Minimap Revealer
 Reveal
@@ -41,3 +41,6 @@ minimap tiles
 Reveal
 Hide
 Fix broken minimap save file
+Chunk Editor+
+mask
+CHUNK EDITOR+

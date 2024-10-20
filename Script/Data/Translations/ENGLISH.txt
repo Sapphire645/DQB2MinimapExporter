@@ -5,7 +5,7 @@ Invalid file!
 Select binary file
 Selected file
 No file selected
-Minimap Exporter
+DQB2 Minimap Exporter
 Open File
 Select All
 Unselect All
@@ -16,3 +16,31 @@ mask
 Chunky Tiles 1x
 Chunky Tiles 16x
 Export!
+#-Here are the names of the saved maps, change if you want.
+STGDAT01-IoA
+STGDAT02-Furrowfield
+STGDAT03-Khrumbul-Dun
+STGDAT04-Moonbrooke
+STGDAT05-Malhalla
+STGDAT09-Angler
+STGDAT10-Skelkatraz
+STGDAT12-BuildertopiaAlpha
+STGDAT13-BuildertopiaBeta
+STGDAT14-BattleAtoll
+STGDAT16-BuildertopiaGamma
+Partial
+Full
+NOTE: BUILDERTOPIA
+HERMIT'S HERESY /
+CROPPING MAY BE WRONG.
+DQB2 Minimap Revealer
+Reveal
+full minimap
+Reset
+minimap tiles
+Reveal
+Hide
+Fix broken minimap save file
+Chunk Editor+
+mask
+CHUNK EDITOR+
